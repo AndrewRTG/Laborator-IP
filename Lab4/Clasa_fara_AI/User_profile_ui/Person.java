@@ -4,6 +4,7 @@ public class Person {
     private String username;
     private String email;
     private String password;
+    private String maskedPassword ;
     private String firstName;
     private String lastName;
     private String bio;
@@ -61,6 +62,13 @@ public class Person {
     public void setLocation(String location) {
         this.location = location;
     }
+    public void setPassword(String password) {
+        this.password = password;
+        this.maskedPassword = "*".repeat(password.length());
+    }
+    public String getMaskedPassword() {
+        return maskedPassword;
+    }
     void updateProfile(String firstName, String lastName){
         this.firstName = firstName;
         this.lastName = lastName;
@@ -73,5 +81,15 @@ public class Person {
         System.out.println("Email: " + email);
         System.out.println("Bio: " + bio);
         System.out.println("Location: " + location);
+        System.out.println("Password: " + maskedPassword);
+    }
+    public boolean authenticate(String inputPassword) {
+        if (this.password.equals(inputPassword)) {
+            System.out.println("Login successful!");
+            return true;
+        } else {
+            System.out.println("Incorrect password!");
+            return false;
+        }
     }
 }

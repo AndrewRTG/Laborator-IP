@@ -10,7 +10,7 @@ public class DataFetchingComponent {
 
     public DataFetchingComponent() {
         retailers = new ArrayList<>();
-        specificationSources = new ArrayList<>();
+        specificationSources =   new ArrayList<>();
         rawDataBuffer = new ArrayList<>();
     }
 
@@ -24,74 +24,89 @@ public class DataFetchingComponent {
     /**
      * Adauga o sursa externa de specificatii.
      */
-    public void addSpecificationSource(SpecificationSource source) {
-        specificationSources.add(source);
-    }
+    public List<RawData> fetchPricesFromRetailer(Retailer retailer) {
 
-    /**
-     * Contacteaza fiecare retailer si colecteaza preturi brute.
-     * Datele sunt simulate si salvate in rawDataBuffer.
-     */
-    public void fetchPrices() {
+        List<RawData> result = new ArrayList<>();
 
-        for (Retailer retailer : retailers) {
+        int attempts = 0;
+        boolean success = false;
 
-            RawData data = new RawData(
-                    "price",
-                    retailer.getName(),
-                    "Pret simulare pentru produs"
-            );
+        while (!success && attempts < maxRetries) {
 
-            rawDataBuffer.add(data);
+            attempts++;
+
+            try {
+
+                simulateExternalDelay();
+
+                if (random.nextInt(10) < 2) {
+                    throw new RuntimeException("Simulated network error");
+                }
+
+                int numberOfProducts = random.nextInt(3) + 1;
+
+                for (int i = 0; i < numberOfProducts; i++) {
+
+                    String product = "Product_" + random.nextInt(100);
+                    double price = 500 + random.nextInt(2000);
+
+                    RawData data = new RawData(
+                            "PRICE",
+                            retailer.getName(),
+                            product,
+                            "price=" + price
+                    );
+
+                    result.add(data);
+                }
+
+                success = true;
+
+            } catch (Exception e) {
+
+                if (attempts >= maxRetries) {
+                    System.out.println("Failed to fetch prices from " + retailer.getName());
+                }
+            }
         }
+
+        return result;
     }
 
-    /**
-     * Colecteaza specificatii tehnice din surse externe.
-     */
-    public void fetchSpecifications() {
+    public List<RawData> fetchSpecificationsFromSource(SpecificationSource source) {
 
-        for (SpecificationSource source : specificationSources) {
+        List<RawData> result = new ArrayList<>();
 
-            RawData data = new RawData(
-                    "specification",
-                    source.getName(),
-                    "Specificatii simulate pentru dispozitiv"
-            );
+        try {
 
-            rawDataBuffer.add(data);
+            simulateExternalDelay();
+
+            int devices = random.nextInt(3) + 1;
+
+            for (int i = 0; i < devices; i++) {
+
+                String device = "Device_" + random.nextInt(100);
+
+                RawData data = new RawData(
+                        "SPEC",
+                        source.getName(),
+                        device,
+                        "ram=8GB;storage=128GB;battery=5000mAh"
+                );
+
+                result.add(data);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error collecting specs from " + source.getName());
         }
+
+        return result;
     }
 
-    /**
-     * Metoda principala care colecteaza toate datele externe.
-     */
-    public void collectAllData() {
 
-        fetchPrices();
-        fetchSpecifications();
-
-        lastFetchTimestamp = System.currentTimeMillis();
-    }
-
-    /**
-     * Trimite datele brute catre componenta de parsare.
-     */
-    public void sendRawDataToParser(ParsingComponent parser) {
-
-        parser.parse(rawDataBuffer);
-
-        rawDataBuffer.clear();
-    }
-
-    public long getLastFetchTimestamp() {
-        return lastFetchTimestamp;
-    }
-
-    public List<RawData> getRawDataBuffer() {
-        return rawDataBuffer;
-    }
-}
+/**
+a
 
 // promptul pus pe AI
 
@@ -103,3 +118,8 @@ public class DataFetchingComponent {
 //avantaj: impartite eficient in mai multe clase si cu comentarii inteligibile
 
 //dezavantaj: a durat mult si unele clase nu au complexitate,
+
+
+ // pormpt pus pe AI
+
+ //Creeaza o clasa principala numita DataFetchingComponent. Clasa trebuie sa contina mai multe atribute, de exemplu: lista de retaileri (List<Retailer> retailers) lista de surse de specificatii (List<SpecificationSource> specificationSources)
